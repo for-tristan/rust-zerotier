@@ -1,3 +1,5 @@
+mod eth;
+
 use clap::{Parser, Subcommand};
 
 /// rust-zerotier — an educational L2 VPN (virtual switch + virtual port).
