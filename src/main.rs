@@ -1,6 +1,7 @@
 mod eth;
 mod state;
 mod tap;
+mod vport;
 mod vswitch;
 
 use clap::{Parser, Subcommand};
@@ -46,7 +47,12 @@ fn main() {
             server_ip,
             server_port,
         } => {
-            eprintln!("[rzt] vport -> {server_ip}:{server_port} — not yet implemented");
+            let state = vport::shared_state();
+            state.lock().unwrap().cli_echo = true;
+            if let Err(e) = vport::run(&server_ip, server_port, state) {
+                eprintln!("[rzt] vport error: {e}");
+                std::process::exit(1);
+            }
         }
         Commands::Gui => {
             eprintln!("[rzt] gui — not yet implemented");
