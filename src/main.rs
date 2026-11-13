@@ -2,8 +2,9 @@
 //! a Rust port of build-your-own-zerotier with a minimalist control-panel GUI.
 
 mod eth;
-#[allow(dead_code)] // consumed by the GUI in the next commit
+#[allow(dead_code)] // icon palette: not every constant is consumed by the GUI
 mod fa;
+mod gui;
 mod state;
 mod tap;
 mod vport;
@@ -110,10 +111,10 @@ fn run(command: Commands) -> i32 {
             0
         }
         Commands::Gui => {
-            eprintln!(
-                "[rzt] the control-panel GUI is not yet available in this build; \
-use `rzt vswitch <port>` or `rzt vport <ip> <port>`."
-            );
+            if let Err(e) = gui::run() {
+                eprintln!("[rzt] gui error: {e}");
+                return 1;
+            }
             0
         }
     }
