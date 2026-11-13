@@ -5,7 +5,7 @@ together mimic the behaviour of ZeroTier, with a minimalist black-and-white
 control-panel GUI. Devices connected to the switch's ports appear to share one
 local network, even when the ports are tunnels reaching across the Internet.
 
-> Inspired by [`for-tristan/build-your-own-zerotier`](https://github.com/for-tristan/build-your-own-zerotier),
+> Inspired by [`peiyuanix/build-your-own-zerotier`](https://github.com/peiyuanix/build-your-own-zerotier),
 > an educational C + Python implementation of the same concept. The original
 > idea and the switch/port model are by Liu Peiyuan.
 
