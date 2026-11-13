@@ -13,4 +13,4 @@ Under active development. See the commit history for build progress.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Original concept © 2023 Liu Peiyuan.
+MIT see [LICENSE](LICENSE). Original concept © 2023 Liu Peiyuan.
