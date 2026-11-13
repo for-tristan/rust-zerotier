@@ -60,16 +60,38 @@ mod tests {
     #[test]
     fn font_bytes_are_valid_truetype() {
         // TrueType files start with the 4-byte magic 0x00010000.
-        assert!(FONT_BYTES.len() > 100_000, "embedded font unexpectedly small");
+        assert!(
+            FONT_BYTES.len() > 100_000,
+            "embedded font unexpectedly small"
+        );
         assert_eq!(&FONT_BYTES[0..4], &[0x00, 0x01, 0x00, 0x00]);
     }
 
     #[test]
     fn icons_are_single_private_use_codepoints() {
         let all = [
-            POWER_OFF, COG, PLAY, STOP, ARROW_RIGHT, LIST, TABLE, TRASH, SERVER,
-            NETWORK_WIRED, BROADCAST_TOWER, CHART_BAR, CIRCLE, PLUG, CIRCLE_INFO,
-            CIRCLE_CHECK, CIRCLE_XMARK, CIRCLE_DOT, GAUGE, TERMINAL, ROUTE, ETHERNET,
+            POWER_OFF,
+            COG,
+            PLAY,
+            STOP,
+            ARROW_RIGHT,
+            LIST,
+            TABLE,
+            TRASH,
+            SERVER,
+            NETWORK_WIRED,
+            BROADCAST_TOWER,
+            CHART_BAR,
+            CIRCLE,
+            PLUG,
+            CIRCLE_INFO,
+            CIRCLE_CHECK,
+            CIRCLE_XMARK,
+            CIRCLE_DOT,
+            GAUGE,
+            TERMINAL,
+            ROUTE,
+            ETHERNET,
         ];
         for icon in all {
             assert_eq!(icon.chars().count(), 1, "{icon} is not a single codepoint");

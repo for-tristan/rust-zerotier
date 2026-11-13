@@ -34,8 +34,6 @@ impl Mode {
 /// One line in the live traffic log.
 #[derive(Clone)]
 pub struct LogEntry {
-    /// Milliseconds since the process started — used for stable ordering.
-    pub ts_ms: u128,
     /// `HH:MM:SS.mmm` wall-clock string for display.
     pub time_str: String,
     /// Whether the frame was received or sent by the local role.
@@ -141,9 +139,7 @@ impl AppState {
 
     /// Elapsed seconds since [`start`](Self::start), or 0 if not started.
     pub fn uptime_secs(&self) -> u64 {
-        self.started_at
-            .map(|t| t.elapsed().as_secs())
-            .unwrap_or(0)
+        self.started_at.map(|t| t.elapsed().as_secs()).unwrap_or(0)
     }
 
     /// Learn a source MAC -> endpoint mapping.
@@ -176,11 +172,6 @@ impl AppState {
         seen
     }
 
-    /// Number of peers currently in the MAC table.
-    pub fn peer_count(&self) -> usize {
-        self.mac_table.len()
-    }
-
     /// Append a log entry, evicting the oldest when the ring is full.
     pub fn log(&mut self, entry: LogEntry) {
         if self.log.len() >= LOG_CAP {
@@ -203,7 +194,9 @@ pub fn shared(mode: Mode) -> SharedState {
 /// timezone dependency).
 pub fn now_time_str() -> String {
     use std::time::{SystemTime, UNIX_EPOCH};
-    let dur = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default();
+    let dur = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default();
     let secs = dur.as_secs();
     let h = (secs / 3600) % 24;
     let m = (secs / 60) % 60;
@@ -220,13 +213,7 @@ pub fn make_log(
     peer: impl std::fmt::Display,
     note: impl std::fmt::Display,
 ) -> LogEntry {
-    use std::time::{SystemTime, UNIX_EPOCH};
-    let ts_ms = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map(|d| d.as_millis())
-        .unwrap_or(0);
     LogEntry {
-        ts_ms,
         time_str: now_time_str(),
         dir,
         src: src.to_string(),
@@ -256,7 +243,7 @@ mod tests {
         assert!(s.learn(mac(1), peer(100))); // new
         assert!(!s.learn(mac(1), peer(100))); // unchanged
         assert!(s.learn(mac(1), peer(200))); // changed
-        assert_eq!(s.peer_count(), 1);
+        assert_eq!(s.mac_table.len(), 1);
     }
 
     #[test]
@@ -287,9 +274,8 @@ mod tests {
     #[test]
     fn log_ring_evicts_oldest_when_full() {
         let mut s = AppState::new(Mode::Switch);
-        for i in 0..(LOG_CAP + 5) as u128 {
+        for i in 0..(LOG_CAP + 5) {
             s.log(LogEntry {
-                ts_ms: i,
                 time_str: String::new(),
                 dir: Direction::In,
                 src: String::new(),

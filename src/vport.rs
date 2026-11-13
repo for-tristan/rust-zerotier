@@ -133,8 +133,7 @@ fn forward_vswitch_to_tap(sock: UdpSocket, tapfd: RawFd, state: SharedState) {
         let (n, peer) = match sock.recv_from(&mut buf) {
             Ok(v) => v,
             Err(ref e)
-                if e.kind() == io::ErrorKind::WouldBlock
-                    || e.kind() == io::ErrorKind::TimedOut =>
+                if e.kind() == io::ErrorKind::WouldBlock || e.kind() == io::ErrorKind::TimedOut =>
             {
                 continue;
             }
@@ -155,7 +154,14 @@ fn log_up(state: &SharedState, data: &[u8], server: SocketAddr) {
     let mut s = state.lock().unwrap();
     s.stats.frames_out += 1;
     let echo = s.cli_echo;
-    s.log(state::make_log(Direction::Out, &src, &dst, size, server, "tap -> vswitch"));
+    s.log(state::make_log(
+        Direction::Out,
+        &src,
+        &dst,
+        size,
+        server,
+        "tap -> vswitch",
+    ));
     if echo {
         eprintln!("[vport] tap -> {server}: {src} -> {dst} ({size}B)");
     }

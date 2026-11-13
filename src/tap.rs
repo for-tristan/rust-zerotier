@@ -121,7 +121,7 @@ mod tests {
     fn name_hint_is_truncated_to_ifnamsiz_minus_one() {
         let mut ifr = Ifreq::zeroed();
         let long = "abcdefghijklmnopqrstuvwxyz"; // 26 chars
-        let n = long.as_bytes().len().min(IFNAMSIZ - 1);
+        let n = long.len().min(IFNAMSIZ - 1);
         ifr.ifr_name[..n].copy_from_slice(&long.as_bytes()[..n]);
         // last slot stays NUL so the kernel sees a terminated string
         assert_eq!(ifr.ifr_name[IFNAMSIZ - 1], 0);

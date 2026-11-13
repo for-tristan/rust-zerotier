@@ -48,25 +48,21 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     /// Run the virtual switch server (UDP, MAC learning, frame forwarding).
-    #[command(
-        long_about = "Run the virtual switch server.\n\n\
+    #[command(long_about = "Run the virtual switch server.\n\n\
 Binds 0.0.0.0:PORT and forwards Ethernet frames between connected VPorts while \
 maintaining a source-MAC learning table: unicast to a known destination, \
 broadcast to every VPort except the source, discard unknown unicast.\n\n\
-Faithful port of vswitch.py."
-    )]
+Faithful port of vswitch.py.")]
     Vswitch {
         /// UDP port to listen on.
         port: u16,
     },
     /// Run the virtual port client (TAP device <-> VSwitch relay).
-    #[command(
-        long_about = "Run the virtual port client.\n\n\
+    #[command(long_about = "Run the virtual port client.\n\n\
 Allocates a Linux TAP device (default name rzt0) and relays Ethernet frames in \
 both directions between the kernel network stack and a remote vswitch over UDP, \
 using two threads (one per direction).\n\n\
-Faithful port of vport.c. Requires root or CAP_NET_ADMIN."
-    )]
+Faithful port of vport.c. Requires root or CAP_NET_ADMIN.")]
     Vport {
         /// VSwitch server IP address (or hostname).
         server_ip: String,

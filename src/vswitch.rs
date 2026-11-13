@@ -35,8 +35,7 @@ pub fn run(port: u16, state: SharedState) -> io::Result<()> {
         let (n, peer) = match sock.recv_from(&mut buf) {
             Ok(v) => v,
             Err(ref e)
-                if e.kind() == io::ErrorKind::WouldBlock
-                    || e.kind() == io::ErrorKind::TimedOut =>
+                if e.kind() == io::ErrorKind::WouldBlock || e.kind() == io::ErrorKind::TimedOut =>
             {
                 continue;
             }
@@ -156,7 +155,14 @@ fn handle_frame(sock: &UdpSocket, data: &[u8], peer: SocketAddr, state: &SharedS
     } else {
         // unknown unicast: discard, as in the original
         s.stats.discarded += 1;
-        s.log(state::make_log(Direction::In, src, dst, size, peer, "discarded"));
+        s.log(state::make_log(
+            Direction::In,
+            src,
+            dst,
+            size,
+            peer,
+            "discarded",
+        ));
         if echo {
             eprintln!("[vswitch] {src} -> {dst} ({size}B) discarded");
         }

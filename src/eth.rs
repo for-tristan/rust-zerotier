@@ -1,7 +1,7 @@
 //! Ethernet frame header parsing.
 //!
 //! Mirrors the minimal parsing done by the original `vswitch.py`:
-//! a 14-byte header split into destination MAC, source MAC and EtherType.
+//! a 14-byte header split into destination MAC and source MAC.
 
 use std::fmt;
 
@@ -12,19 +12,6 @@ pub struct MacAddr(pub [u8; 6]);
 impl MacAddr {
     /// The Ethernet broadcast address `ff:ff:ff:ff:ff:ff`.
     pub const BROADCAST: MacAddr = MacAddr([0xff; 6]);
-
-    /// Parse six colon-separated hex octets, e.g. `aa:bb:cc:dd:ee:ff`.
-    pub fn parse(s: &str) -> Option<MacAddr> {
-        let mut octets = [0u8; 6];
-        let parts: Vec<&str> = s.split(':').collect();
-        if parts.len() != 6 {
-            return None;
-        }
-        for (i, part) in parts.iter().enumerate() {
-            octets[i] = u8::from_str_radix(part, 16).ok()?;
-        }
-        Some(MacAddr(octets))
-    }
 
     /// True for the broadcast address.
     pub fn is_broadcast(&self) -> bool {
@@ -49,8 +36,6 @@ impl fmt::Display for MacAddr {
 pub struct EtherHeader {
     pub dst: MacAddr,
     pub src: MacAddr,
-    /// The 16-bit EtherType field (e.g. `0x0806` = ARP, `0x0800` = IPv4).
-    pub ethertype: u16,
 }
 
 impl EtherHeader {
@@ -64,23 +49,10 @@ impl EtherHeader {
         let mut src = [0u8; 6];
         dst.copy_from_slice(&buf[0..6]);
         src.copy_from_slice(&buf[6..12]);
-        let ethertype = u16::from_be_bytes([buf[12], buf[13]]);
         Some(EtherHeader {
             dst: MacAddr(dst),
             src: MacAddr(src),
-            ethertype,
         })
-    }
-
-    /// Human-readable EtherType label, when known.
-    pub fn ethertype_label(&self) -> &'static str {
-        match self.ethertype {
-            0x0800 => "IPv4",
-            0x0806 => "ARP",
-            0x86dd => "IPv6",
-            0x8100 => "802.1Q",
-            _ => "other",
-        }
     }
 }
 
@@ -105,24 +77,15 @@ mod tests {
         let frame = [
             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, // dst broadcast
             0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, // src
-            0x08, 0x06, // ethertype ARP
+            0x08, 0x06, // ethertype (ARP) — not used by the switch, only MACs are
         ];
         let h = EtherHeader::parse(&frame).unwrap();
         assert!(h.dst.is_broadcast());
         assert_eq!(h.src.to_string(), "aa:bb:cc:dd:ee:ff");
-        assert_eq!(h.ethertype, 0x0806);
-        assert_eq!(h.ethertype_label(), "ARP");
     }
 
     #[test]
     fn too_short_returns_none() {
         assert!(EtherHeader::parse(&[0u8; 10]).is_none());
-    }
-
-    #[test]
-    fn parse_round_trips() {
-        let s = "de:ad:be:ef:00:01";
-        let mac = MacAddr::parse(s).unwrap();
-        assert_eq!(mac.to_string(), s);
     }
 }
