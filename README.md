@@ -1,6 +1,6 @@
 # rust-zerotier
 
-A Rust port of an educational L2 VPN — a virtual switch and virtual port that
+A Rust port of an educational L2 VPN a virtual switch and virtual port that
 mimics the behaviour of ZeroTier, with a minimalist black-and-white control
 panel GUI.
 
