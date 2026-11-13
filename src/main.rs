@@ -1,6 +1,7 @@
 mod eth;
 mod state;
 mod tap;
+mod vswitch;
 
 use clap::{Parser, Subcommand};
 
@@ -34,7 +35,12 @@ fn main() {
     let cli = Cli::parse();
     match cli.command {
         Commands::Vswitch { port } => {
-            eprintln!("[rzt] vswitch on port {port} — not yet implemented");
+            let state = vswitch::shared_state();
+            state.lock().unwrap().cli_echo = true;
+            if let Err(e) = vswitch::run(port, state) {
+                eprintln!("[rzt] vswitch error: {e}");
+                std::process::exit(1);
+            }
         }
         Commands::Vport {
             server_ip,

@@ -103,6 +103,9 @@ pub struct AppState {
     pub log: VecDeque<LogEntry>,
     pub stats: Stats,
     pub last_error: Option<String>,
+    /// When true, the networking core also prints a concise per-frame line to
+    /// stderr (used by the CLI; the GUI leaves this off).
+    pub cli_echo: bool,
 }
 
 impl AppState {
@@ -117,6 +120,7 @@ impl AppState {
             log: VecDeque::with_capacity(LOG_CAP),
             stats: Stats::default(),
             last_error: None,
+            cli_echo: false,
         }
     }
 
@@ -193,6 +197,44 @@ pub type SharedState = Arc<Mutex<AppState>>;
 /// Convenience constructor.
 pub fn shared(mode: Mode) -> SharedState {
     Arc::new(Mutex::new(AppState::new(mode)))
+}
+
+/// Current wall-clock time as `HH:MM:SS.mmm` (UTC — deterministic, no
+/// timezone dependency).
+pub fn now_time_str() -> String {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    let dur = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default();
+    let secs = dur.as_secs();
+    let h = (secs / 3600) % 24;
+    let m = (secs / 60) % 60;
+    let s = secs % 60;
+    format!("{:02}:{:02}:{:02}.{:03}", h, m, s, dur.subsec_millis())
+}
+
+/// Build a [`LogEntry`] with the current timestamp filled in.
+pub fn make_log(
+    dir: Direction,
+    src: impl std::fmt::Display,
+    dst: impl std::fmt::Display,
+    size: usize,
+    peer: impl std::fmt::Display,
+    note: impl std::fmt::Display,
+) -> LogEntry {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    let ts_ms = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_millis())
+        .unwrap_or(0);
+    LogEntry {
+        ts_ms,
+        time_str: now_time_str(),
+        dir,
+        src: src.to_string(),
+        dst: dst.to_string(),
+        size,
+        peer: peer.to_string(),
+        note: note.to_string(),
+    }
 }
 
 #[cfg(test)]
