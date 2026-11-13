@@ -2,6 +2,8 @@
 //! a Rust port of build-your-own-zerotier with a minimalist control-panel GUI.
 
 mod eth;
+#[allow(dead_code)] // consumed by the GUI in the next commit
+mod fa;
 mod state;
 mod tap;
 mod vport;

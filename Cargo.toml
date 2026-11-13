@@ -15,6 +15,10 @@ path = "src/main.rs"
 [dependencies]
 clap = { version = "4", features = ["derive"] }
 libc = "0.2"
+# eframe pulls in egui + winit. Wayland is disabled (no wayland dev headers in
+# this environment); the X11 backend is kept. On a normal desktop, default
+# features work fine — this just trims the build for headless CI.
+eframe = { version = "0.29", default-features = false, features = ["glow", "default_fonts", "x11"] }
 
 [profile.release]
 opt-level = 3
