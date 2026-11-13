@@ -184,5 +184,4 @@ unknown unicast.
 
 ## License
 
-MIT - see [LICENSE](LICENSE). The original concept is by Liu Peiyuan
-(build-your-own-zerotier, MIT, 2023).
+MIT - see [LICENSE](LICENSE).
