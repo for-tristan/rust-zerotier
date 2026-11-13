@@ -1,0 +1,22 @@
+[package]
+name = "rust-zerotier"
+version = "0.1.0"
+edition = "2021"
+description = "An educational L2 VPN — virtual switch + virtual port with a minimalist GUI. Inspired by for-tristan/build-your-own-zerotier."
+license = "MIT"
+repository = "https://github.com/for-tristan/rust-zerotier"
+keywords = ["vpn", "zerotier", "tap", "l2", "networking"]
+categories = ["network-programming"]
+
+[[bin]]
+name = "rzt"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
