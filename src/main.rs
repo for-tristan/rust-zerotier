@@ -1,4 +1,5 @@
 mod eth;
+mod state;
 mod tap;
 
 use clap::{Parser, Subcommand};
